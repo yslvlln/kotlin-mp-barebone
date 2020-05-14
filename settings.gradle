@@ -1,0 +1,3 @@
+rootProject.name='KotlinMP-Barebone'
+include ':app'
+include ':shared'
