@@ -1,5 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.multiplatform'
+    id 'base'
+    id 'maven-publish'
 }
 
 repositories {
@@ -7,12 +9,11 @@ repositories {
     mavenCentral()
 }
 
-apply plugin: 'maven-publish'
 apply plugin: 'com.android.library'
 
 def GROUP_ID = "com.yslvlln"
 def ARTIFACT_ID = "kmp-printer"
-def LIBRARY_VERSION_NAME=0.1
+def LIBRARY_VERSION_NAME = 0.1
 
 group GROUP_ID
 version LIBRARY_VERSION_NAME
@@ -40,8 +41,8 @@ kotlin {
     // This is for iPhone emulator
     // Switch here to iosArm64 (or iosArm32) to build library for iPhone device
     targets {
-        final def iOSTarget = System.getenv('SDK_NAME')?.startsWith("iphoneos") \
-                          ? presets.iosArm64 : presets.iosX64
+        final def iOSTarget = System.getenv('SDK_NAME')?.startsWith("iphoneos")  \
+                           ? presets.iosArm64 : presets.iosX64
 
         fromPreset(iOSTarget, 'ios') {
             binaries {
@@ -84,8 +85,7 @@ kotlin {
     }
 }
 
-
-project.afterEvaluate {
+afterEvaluate {
     project.publishing.publications.all {
         // rename artifacts
         groupId = GROUP_ID
@@ -96,6 +96,7 @@ project.afterEvaluate {
         }
     }
 }
+
 // This task attaches native framework built from ios module to Xcode project
 // (see iosApp directory). Don't run this task directly,
 // Xcode runs this task itself during its build process.
