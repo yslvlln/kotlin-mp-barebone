@@ -1,6 +1,5 @@
 plugins {
     id 'org.jetbrains.kotlin.multiplatform'
-    id 'com.jfrog.bintray' version '1.8.5'
 }
 
 repositories {
@@ -9,18 +8,11 @@ repositories {
 }
 
 apply plugin: 'maven-publish'
-apply plugin: 'base'
-apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.android.library'
 
 def GROUP_ID = "com.yslvlln"
-def ARTIFACT_ID = "shared-printer"
-def BINTRAY_REPOSITORY= "kotlin-mp-barebone"
-def BINTRAY_ORGINIZATION= "yslvlln"
-def ISSUE_URL="https://github.com/yslvlln/kotlin-mp-barebone/issues"
-def SITE_URL = "https://github.com/yslvlln/kotlin-mp-barebone"
-def VCS_URL= "https://github.com/yslvlln/kotlin-mp-barebone.git"
-def LIBRARY_VERSION_NAME=1.0
+def ARTIFACT_ID = "kmp-printer"
+def LIBRARY_VERSION_NAME=0.1
 
 group GROUP_ID
 version LIBRARY_VERSION_NAME
@@ -47,9 +39,6 @@ android {
 kotlin {
     // This is for iPhone emulator
     // Switch here to iosArm64 (or iosArm32) to build library for iPhone device
-    android {
-        publishLibraryVariants("release")
-    }
     targets {
         final def iOSTarget = System.getenv('SDK_NAME')?.startsWith("iphoneos") \
                           ? presets.iosArm64 : presets.iosX64
@@ -95,7 +84,8 @@ kotlin {
     }
 }
 
-afterEvaluate {
+
+project.afterEvaluate {
     project.publishing.publications.all {
         // rename artifacts
         groupId = GROUP_ID
@@ -106,53 +96,6 @@ afterEvaluate {
         }
     }
 }
-
-def getBintrayUserProperty() {
-    return hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-}
-
-def getBintrayApiKeyProperty() {
-    return hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
-}
-
-bintray {
-    //A user name of bintray to A, and API key of Bintray to B.I do not want to include API Key in git,
-    // so I am gradle.properties writing locally.
-    // Gradle's property file is read in the order of gradle in the home directory> gradle in the project directory,
-    // so if it is written in property in the home directory, it will be useful for other projects as well.
-    user = getBintrayUserProperty()
-    key = getBintrayApiKeyProperty()
-    //f you set publish to true, the new version will be published the moment you upload to bintray. If false, it will not be published unless you press the publish button on the bintray web.
-    // It is recommended that you make it false because it can prevent an accident that you accidentally release the latest version.
-    publish = false
-
-    pkg {
-        repo = BINTRAY_REPOSITORY
-        name = ARTIFACT_ID
-        userOrg = BINTRAY_ORGINIZATION
-        licenses = ['Apache-2.0']
-        vcsUrl = VCS_URL
-        websiteUrl = SITE_URL
-        issueTrackerUrl = ISSUE_URL
-
-        version {
-            name = LIBRARY_VERSION_NAME
-            vcsTag = LIBRARY_VERSION_NAME
-            released = new Date()
-        }
-    }
-}
-
-bintrayUpload.doFirst {
-    publications = publishing.publications.collect {
-        it.name
-    }.findAll {
-        it != "kotlinMultiplatform"
-    }
-}
-
-bintrayUpload.dependsOn publishToMavenLocal
-
 // This task attaches native framework built from ios module to Xcode project
 // (see iosApp directory). Don't run this task directly,
 // Xcode runs this task itself during its build process.
