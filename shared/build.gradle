@@ -10,6 +10,9 @@ repositories {
 apply plugin: 'maven-publish'
 apply plugin: 'com.android.library'
 
+def GROUP_ID = "com.yslvlln"
+def ARTIFACT_ID = "shared-printer"
+
 android {
     compileSdkVersion 28
 
@@ -48,6 +51,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                implementation kotlin('stdlib-common')
             }
         }
         commonTest {
@@ -58,6 +62,7 @@ kotlin {
         }
         androidMain {
             dependencies {
+                implementation kotlin('stdlib')
             }
         }
         androidTest {
@@ -71,6 +76,18 @@ kotlin {
             }
         }
         iosTest {
+        }
+    }
+}
+
+afterEvaluate {
+    project.publishing.publications.all {
+        // rename artifacts
+        groupId = GROUP_ID
+        if (it.name.contains('metadata')) {
+            artifactId = "$ARTIFACT_ID"
+        } else {
+            artifactId = "$ARTIFACT_ID-$name"
         }
     }
 }
