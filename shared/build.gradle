@@ -1,6 +1,5 @@
 plugins {
     id 'org.jetbrains.kotlin.multiplatform'
-    id 'base'
     id 'maven-publish'
 }
 
@@ -9,14 +8,11 @@ repositories {
     mavenCentral()
 }
 
+group 'com.example'
+version '0.0.1'
+
+apply plugin: 'maven-publish'
 apply plugin: 'com.android.library'
-
-def GROUP_ID = "com.yslvlln"
-def ARTIFACT_ID = "kmp-printer"
-def LIBRARY_VERSION_NAME = 0.1
-
-group GROUP_ID
-version LIBRARY_VERSION_NAME
 
 android {
     compileSdkVersion 28
@@ -85,17 +81,6 @@ kotlin {
     }
 }
 
-afterEvaluate {
-    project.publishing.publications.all {
-        // rename artifacts
-        groupId = GROUP_ID
-        if (it.name.contains('metadata')) {
-            artifactId = "$ARTIFACT_ID"
-        } else {
-            artifactId = "$ARTIFACT_ID-$name"
-        }
-    }
-}
 
 // This task attaches native framework built from ios module to Xcode project
 // (see iosApp directory). Don't run this task directly,
@@ -117,4 +102,8 @@ task copyFramework {
             include 'shared.framework.dSYM'
         }
     }
+}
+
+configurations {
+    compileClasspath
 }
